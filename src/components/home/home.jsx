@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export const Home = () => {
   return (
-    <div className="bg-[#d4e5f8] pt-5 h-[100vh]">
+    <div className="bg-[#d4e5f8] pt-5 h-full">
       <div className="container mt-[100px] flex justify-between">
         <div>
           <li className="font-normal text-[#8d8e8f] leading-6 text-base">

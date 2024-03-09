@@ -14,7 +14,7 @@ import { GrPrevious } from "react-icons/gr";
 import { GrNext } from "react-icons/gr";
 import { LiaRubleSignSolid } from "react-icons/lia";
 
-export const Catalog = () => {
+export const CatalogPage = () => {
   const [productIds, setProductIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState([]);
@@ -75,39 +75,45 @@ export const Catalog = () => {
   }, []);
 
   useEffect(() => {
-    getFilteredData("product", searchInputValue, setProductIds);
+    setLoading(true);
+    getFilteredData("product", searchInputValue, (filteredProducts) => {
+      setProductIds(filteredProducts);
+      setLoading(false);
+    });
   }, [searchInputValue]);
 
   useEffect(() => {
     if (currentPrice) {
       clearTimeout(timerRef.current);
+      setLoading(true);
       timerRef.current = setTimeout(() => {
         getFilteredData("price", currentPrice, setProductIds);
+        setLoading(false);
       }, 60);
     }
     return () => clearTimeout(timerRef.current);
   }, [currentPrice, setProductIds]);
-
+  console.log(products);
   return (
     <div className="pt-20">
       <div className="container mb-5 h-full">
         <h2 className="text-center text-3xl font-medium leading-6 my-8">
           Каталог ювелирных украшений
         </h2>
-        <div className="border-2 flex justify-between items-center border-gray-400 p-3 rounded-lg my-4 ">
+        <div className="border-2 flex justify-between items-center relative border-gray-400 p-2 rounded-lg my-4">
           <input
             type="text"
             placeholder="Search product name"
-            className="border-none text-xl outline-none"
+            className="w-full text-xl outline-none border-none p-1"
             value={searchInputValue || ""}
             onChange={(e) => setSearchInputValue(e.target.value)}
           />
-          <IoSearch className="text-2xl text-gray-500" />
+          <IoSearch className="absolute right-2 text-2xl text-gray-500 cursor-pointer" />
         </div>
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex justify-between items-center my-10 w-full">
           <button
             onClick={() => setCurrentPage((prev) => prev - 50)}
-            className="text-white p-3 cursor-pointer rounded-md"
+            className="text-white cursor-pointer rounded-md"
             disabled={currentPage === 1}
           >
             <GrPrevious className="text-2xl text-red-600" />
@@ -119,13 +125,15 @@ export const Catalog = () => {
           <button
             disabled={isSelectedOption}
             onClick={() => setCurrentPage((prev) => prev + 50)}
-            className="p-3 cursor-pointer rounded-md"
+            className="cursor-pointer rounded-md"
           >
             <GrNext className="text-2xl text-red-600" />
           </button>
         </div>
         <div className="mt-6 flex items-start  justify-between">
           <div className="w-[600px]">
+            <h3 className="text-3xl font-semibold mb-3 -mt-3">Фильтр</h3>
+
             <div className="">
               <p className="text-xl mb-7 font-semibold">Цена</p>
               <Slider data={allProductPrices} onChange={setCurrentPrice} />
@@ -135,12 +143,13 @@ export const Catalog = () => {
               </p>
             </div>
             <div>
-              <div className="flex items-center h-full w-full">
+              <p className="mt-10 text-xl font-semibold mb-5">Бренд</p>
+              <div className="flex ">
                 <div className="relative mb-2 flex items-center after:w-[10px] after:h-[10px] after:border-red-500 after:border-b after:border-r after:transform after:rotate-45 after:absolute after:right-3">
                   <select
                     required
                     onChange={(e) => handleBrandFilter(e.target.value)}
-                    className="text-black/70 bg-white px-3 py-2 transition-all cursor-pointer hover:border-red-500 border border-gray-200 rounded-lg outline-red-500 appearance-none invalid:text-black/30 w-64"
+                    className="text-black/70 bg-white px-3 py-2 transition-all cursor-pointer hover:border-red-500 border border-gray-200 rounded-lg outline-red-500 appearance-none invalid:text-black/30 w-[315px]"
                   >
                     <option value="All">All Brands</option>
                     {Array.from(new Set(productIdsWithBrands)).map(
@@ -163,6 +172,7 @@ export const Catalog = () => {
               <>
                 {products.map((item, idx) => (
                   <CatalogCard
+                    id={item.id}
                     key={idx}
                     product={item.product}
                     price={item.price}
