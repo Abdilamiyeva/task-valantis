@@ -1,1 +1,1 @@
-export * from './catalog-single'
+export * from "./catalog-single";
